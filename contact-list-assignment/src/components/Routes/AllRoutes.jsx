@@ -13,6 +13,7 @@ export const AllRoutes = ()=>{
     return <Box>
         <Routes>
             <Route path="/" element={<PrivateRoute><Home/></PrivateRoute>} ></Route>
+            
             <Route path="/login" element={<Login/>} ></Route>
         </Routes>
     </Box>
