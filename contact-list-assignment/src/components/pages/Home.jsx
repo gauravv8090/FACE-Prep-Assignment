@@ -1,36 +1,52 @@
-import { Box, Button, Flex, Image, Spacer, Text } from "@chakra-ui/react"
+import { Box, Button, Flex, Image, Spacer, Spinner, Text } from "@chakra-ui/react"
 import { useEffect } from "react";
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
 
-
+const PAGE_NUMBER = 1;
 
 export const Home = ()=>{
+
+
+    const [loading, setLoading] = useState(false);
 
     
     const [countOut, setCountOut] = useState(0);
     
     const [data, setData] = useState([]);
+    const [page, setpage] = useState(PAGE_NUMBER);
     
 
     let limit = 20;
-    let pageCount = 1;
-    let postCount = 1;
-
-
     
     const getData = async ()=>{
         
-        let res = await fetch(`https://randomuser.me/api/?results=${limit}&page=${pageCount}`);
+        setLoading(true)
+        let res = await fetch(`https://randomuser.me/api/?results=${limit}&page=${page}`);
         let res2 = await res.json();
-        
-        setData(res2.results);
+        setData([...data, ...res2.results]);
+        setLoading(false);
         
     }
     
     useEffect(()=>{
         getData()
-    }, [pageCount])
+    }, [page])
+
+    const scrollEnd = ()=>{
+        setTimeout(()=>{
+            setpage(page + 1)
+        }, 1000 )
+    }
+
+
+    window.addEventListener('scroll', ()=>{
+        const {scrollHeight, scrollTop, clientHeight} = document.documentElement;
+        if(scrollTop + clientHeight >= scrollHeight-2 ){
+            console.log("I am At End");
+            scrollEnd()
+        }
+    })
 
     console.log(data);
     
@@ -55,14 +71,15 @@ export const Home = ()=>{
            </Flex>
            <Box mt={{ base: '60px', sm: '60px',  md: '80px', lg: '100px' }} >
            {/* { base: '65px', sm: '65px',  md: '85px', lg: '105px' } */}
-            {
+            { data.length > 0 && 
                 data.map((el)=>{
                     return (
                         <Box key={el.email} h={'50px'} border={'1px solid #ececed'} 
                         height={{ base: '40px', sm: '40px',  md: '60px', lg: '80px' }}
                          display='flex' justifyContent={'space-around'} alignItems={'center'}   >
                             <Box w={'50%'} >
-                            <Text fontSize={{ base: '10px', sm: '10px',  md: '15px', lg: '25px' }} fontWeight='500'  >{el.name.title} {el.name.first} {el.name.last}</Text>
+                            <Text fontSize={{ base: '10px', sm: '10px',  md: '15px', lg: '25px' }}
+                             fontWeight='500'  >{el.name.title} {el.name.first} {el.name.last}</Text>
                             </Box>
                             <Box w={'25%'} fontSize={{ base: '10px', sm: '10px',  md: '15px', lg: '25px' }}
                              fontWeight='500' display='flex' justifyContent={'center'} alignItems='center' >
@@ -77,6 +94,13 @@ export const Home = ()=>{
                 })
             }
            </Box>
+           {
+            loading && <Spinner thickness='4px'
+            speed='0.65s'
+            emptyColor='gray.200'
+            color='blue.500'
+            size='xl'/>
+           }
             {/* <Button onClick={handelLogout}  p={'25px'} ><Text fontSize={'25px'} fontWeight={'400'} >LogOut</Text></Button> */}
         </Box>
     )
