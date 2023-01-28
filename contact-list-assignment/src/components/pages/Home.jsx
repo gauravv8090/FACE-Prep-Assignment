@@ -33,22 +33,27 @@ export const Home = ()=>{
         getData()
     }, [page])
 
+    let timer ;
     const scrollEnd = ()=>{
-        setTimeout(()=>{
+        if(timer){
+            clearTimeout(timer)
+        }
+        timer = setTimeout(()=>{
             setpage(page + 1)
         }, 1000 )
+
     }
 
 
     window.addEventListener('scroll', ()=>{
         const {scrollHeight, scrollTop, clientHeight} = document.documentElement;
-        if(scrollTop + clientHeight >= scrollHeight-2 ){
-            console.log("I am At End");
+        if(scrollTop + clientHeight >= scrollHeight-1 ){
+            // console.log("I am At End");
             scrollEnd()
         }
     })
 
-    console.log(data);
+    // console.log(data);
     
 
 
